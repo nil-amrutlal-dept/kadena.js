@@ -56,13 +56,24 @@ async function getTransactionsRequestkeyByEvent(
     hash: string;
   } & { [prismaModelName]?: 'Block' | undefined },
 ): Promise<string[]> {
-  return (
-    await prismaClient.$queryRaw<{ requestkey: string }[]>`
+  if (events && events.length > 0) {
+    return (
+      await prismaClient.$queryRaw<{ requestkey: string }[]>`
       SELECT t.requestkey
       FROM transactions t
       INNER JOIN events e
       ON e.block = t.block AND e.requestkey = t.requestkey
       WHERE e.qualname IN (${Prisma.join(events as string[])})
       AND t.block = ${parent.hash}`
-  ).map((r) => r.requestkey);
+    ).map((r) => r.requestkey);
+  } else {
+    return (
+      await prismaClient.$queryRaw<{ requestkey: string }[]>`
+      SELECT t.requestkey
+      FROM transactions t
+      INNER JOIN events e
+      ON e.block = t.block AND e.requestkey = t.requestkey
+      WHERE t.block = ${parent.hash}`
+    ).map((r) => r.requestkey);
+  }
 }
