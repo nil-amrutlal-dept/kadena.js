@@ -6,9 +6,8 @@
 //     loadFileAsString('./schema.graphql'),
 //   ],
 
+import { prismaClient } from '../../db/prismaClient';
 import { builder } from '../builder';
-
-import { PrismaClient } from '@prisma/client';
 
 //   resolvers: {
 //     Query: {
@@ -47,7 +46,7 @@ builder.queryField('lastBlockHeight', (t) => {
     type: 'BigInt',
     nullable: true,
     resolve: async () => {
-      const lastBlock = await new PrismaClient().block.findFirst({
+      const lastBlock = await prismaClient.block.findFirst({
         orderBy: {
           height: 'desc',
         },
