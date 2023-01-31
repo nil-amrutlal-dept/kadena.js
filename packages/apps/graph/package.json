@@ -51,5 +51,8 @@
     "@types/node": "^16.0.0",
     "embedded-postgres": "~15.1.0-beta.6",
     "ts-node": "~10.8.2"
+  },
+  "peerDependencies": {
+    "appmetrics-dash": "~5.3.0"
   }
 }
