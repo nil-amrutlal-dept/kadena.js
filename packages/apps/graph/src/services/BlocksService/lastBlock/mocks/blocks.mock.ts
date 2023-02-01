@@ -2083,8 +2083,8 @@ const blocks = [
 export const mockBlocks = blocks.map((b) => {
   return {
     ...b,
-    chainid: BigInt(b.chainid),
-    height: BigInt(b.height),
+    chainid: b.chainid.toString(),
+    height: b.height.toString(),
     nonce: new Decimal(b.nonce),
     target: new Decimal(b.target),
     weight: new Decimal(b.weight),

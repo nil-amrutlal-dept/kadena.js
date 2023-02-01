@@ -6,10 +6,20 @@ export default builder.prismaNode('Block', {
   fields: (t) => ({
     // database fields
     hash: t.exposeID('hash'),
-    chainid: t.expose('chainid', { type: 'BigInt' }),
+    chainid: t.field({
+      type: 'String',
+      resolve(parent) {
+        return parent.chainid.toString();
+      },
+    }),
     creationtime: t.expose('creationtime', { type: 'DateTime' }),
     epoch: t.expose('epoch', { type: 'DateTime' }),
-    height: t.expose('height', { type: 'BigInt' }),
+    height: t.field({
+      type: 'String',
+      resolve(parent) {
+        return parent.height.toString();
+      },
+    }),
     powhash: t.exposeString('powhash'),
 
     // computed fields
@@ -21,6 +31,7 @@ export default builder.prismaNode('Block', {
         events: t.arg.stringList({ required: false, defaultValue: [] }),
       },
       totalCount: true,
+
       query({ events }) {
         if (events && events.length > 0)
           return {

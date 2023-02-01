@@ -5,18 +5,10 @@ import PrismaPlugin from '@pothos/plugin-prisma';
 import type PrismaTypes from '@pothos/plugin-prisma/generated';
 import RelayPlugin from '@pothos/plugin-relay';
 import { Prisma } from '@prisma/client';
-import {
-  BigIntResolver,
-  DateTimeResolver,
-  PositiveFloatResolver,
-} from 'graphql-scalars';
+import { DateTimeResolver, PositiveFloatResolver } from 'graphql-scalars';
 
 interface IDefaultTypesExtension {
   Scalars: {
-    BigInt: {
-      Input: bigint;
-      Output: bigint;
-    };
     DateTime: {
       Input: Date;
       Output: Date;
@@ -61,7 +53,6 @@ type ScalarTypeResolver<TScalarInputShape, TScalarOutputShape> =
 // Defines the custom scalars
 // eslint-disable-next-line @rushstack/typedef-var
 const SCALARS = [
-  ['BigInt', BigIntResolver],
   ['DateTime', DateTimeResolver],
   ['PositiveFloat', PositiveFloatResolver],
 ] as const;

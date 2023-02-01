@@ -25,5 +25,6 @@ const options:
       }
     : undefined;
 
+const _prismaClient = new PrismaClient(options);
 // eslint-disable-next-line @rushstack/typedef-var
-export const prismaClient = new PrismaClient(options);
+export const prismaClient = _prismaClient;

@@ -5,8 +5,18 @@ export default builder.prismaNode('Event', {
   fields: (t) => ({
     // database fields
     qualname: t.exposeString('qualname'),
-    chainid: t.expose('chainid', { type: 'BigInt' }),
-    idx: t.expose('idx', { type: 'BigInt' }),
+    chainid: t.field({
+      type: 'String',
+      resolve(parent) {
+        return parent.chainid.toString();
+      },
+    }),
+    idx: t.field({
+      type: 'String',
+      resolve(parent) {
+        return parent.idx.toString();
+      },
+    }),
     module: t.exposeString('module'),
     modulehash: t.exposeString('modulehash'),
     name: t.exposeString('name'),

@@ -1,4 +1,3 @@
-import { prismaClient } from '../../db/prismaClient';
 import { builder } from '../builder';
 
 export default builder.prismaNode('Transaction', {
@@ -17,7 +16,12 @@ export default builder.prismaNode('Transaction', {
         return JSON.stringify(parent.data);
       },
     }),
-    gas: t.expose('gas', { type: 'BigInt' }),
+    gas: t.field({
+      type: 'String',
+      resolve(parent) {
+        return parent.gas.toString();
+      },
+    }),
 
     // computed fields
 

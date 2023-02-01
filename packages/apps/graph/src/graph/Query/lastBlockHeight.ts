@@ -3,7 +3,7 @@ import { builder } from '../builder';
 
 builder.queryField('lastBlockHeight', (t) => {
   return t.field({
-    type: 'BigInt',
+    type: 'String',
     async resolve() {
       const lastBlock = await prismaClient.block.findFirst({
         orderBy: {
@@ -11,7 +11,7 @@ builder.queryField('lastBlockHeight', (t) => {
         },
       });
 
-      return lastBlock!.height;
+      return lastBlock!.height.toString();
     },
   });
 });
