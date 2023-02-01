@@ -36,31 +36,32 @@ model Block {
 }
 
 model Event {
-  block      String @db.VarChar
-  chainid    BigInt
-  height     BigInt
-  idx        BigInt
-  module     String @db.VarChar
-  modulehash String @db.VarChar
-  name       String @db.VarChar
-  params     Json
-  paramtext  String @db.VarChar
-  qualname   String @db.VarChar
-  requestkey String @db.VarChar
-  blocks     Block  @relation(fields: [block], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  blockHash   String      @map("block") @db.VarChar
+  chainid     BigInt
+  height      BigInt
+  idx         BigInt
+  module      String      @db.VarChar
+  modulehash  String      @db.VarChar
+  name        String      @db.VarChar
+  params      Json
+  paramtext   String      @db.VarChar
+  qualname    String      @db.VarChar
+  requestkey  String      @db.VarChar
+  block       Block       @relation(fields: [blockHash], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  transaction Transaction @relation(fields: [blockHash, requestkey], references: [blockHash, requestkey], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([block, idx, requestkey])
+  @@id([blockHash, idx, requestkey])
   @@index([height(sort: Desc), chainid, idx], map: "events_height_chainid_idx")
   @@index([requestkey])
   @@map("events")
 }
 
 model Minerkey {
-  block  String @db.VarChar
-  key    String @db.VarChar
-  blocks Block  @relation(fields: [block], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  blockHash String @map("block") @db.VarChar
+  key       String @db.VarChar
+  block    Block  @relation(fields: [blockHash], references: [hash], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([block, key])
+  @@id([blockHash, key])
   @@map("minerkeys")
 }
 
@@ -79,7 +80,7 @@ model Signer {
 
 model Transaction {
   badresult    Json?
-  block        String   @db.VarChar
+  blockHash    String   @map("block") @db.VarChar
   chainid      BigInt
   code         String?  @db.VarChar
   continuation Json?
@@ -102,9 +103,10 @@ model Transaction {
   step         BigInt?
   ttl          BigInt
   txid         BigInt?
-  blocks       Block    @relation(fields: [block], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  block        Block    @relation(fields: [blockHash], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  events       Event[]
 
-  @@id([block, requestkey])
+  @@id([blockHash, requestkey])
   @@index([height])
   @@index([requestkey])
   @@map("transactions")
@@ -112,7 +114,7 @@ model Transaction {
 
 model Transfer {
   amount     Decimal @db.Decimal
-  block      String  @db.VarChar
+  blockHash  String  @map("block") @db.VarChar
   chainid    BigInt
   from_acct  String  @db.VarChar
   height     BigInt
@@ -121,9 +123,9 @@ model Transfer {
   modulename String  @db.VarChar
   requestkey String  @db.VarChar
   to_acct    String  @db.VarChar
-  blocks     Block   @relation(fields: [block], references: [hash], onDelete: NoAction, onUpdate: NoAction)
+  block     Block   @relation(fields: [blockHash], references: [hash], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([block, chainid, idx, modulehash, requestkey])
+  @@id([blockHash, chainid, idx, modulehash, requestkey])
   @@index([from_acct, height(sort: Desc), idx], map: "transfers_from_acct_height_idx")
   @@index([to_acct, height(sort: Desc), idx])
   @@map("transfers")

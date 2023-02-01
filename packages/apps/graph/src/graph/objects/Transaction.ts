@@ -2,7 +2,7 @@ import { prismaClient } from '../../db/prismaClient';
 import { builder } from '../builder';
 
 export default builder.prismaNode('Transaction', {
-  id: { field: 'block_requestkey' },
+  id: { field: 'blockHash_requestkey' },
   fields: (t) => ({
     // database fields
     reqKey: t.exposeString('requestkey', {
@@ -17,21 +17,12 @@ export default builder.prismaNode('Transaction', {
         return JSON.stringify(parent.data);
       },
     }),
-
-    // computed fields
     gas: t.expose('gas', { type: 'BigInt' }),
 
+    // computed fields
+
     // relations
-    block: t.prismaField({
-      type: 'Block',
-      nullable: true,
-      resolve(query, parent, args, context, info) {
-        return prismaClient.block.findUnique({
-          where: {
-            hash: parent.block,
-          },
-        });
-      },
-    }),
+    block: t.relation('block'),
+    events: t.relation('events'),
   }),
 });

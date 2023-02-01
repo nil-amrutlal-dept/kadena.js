@@ -30,6 +30,17 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+type Event implements Node {
+  chainid: BigInt!
+  id: ID!
+  idx: BigInt!
+  module: String!
+  modulehash: String!
+  name: String!
+  params: String!
+  qualname: String!
+}
+
 interface Node {
   id: ID!
 }
@@ -48,9 +59,20 @@ type Query {
   blocksFromHeight(chainIds: [Int!], startHeight: Int!): [Block!]!
   completedBlockHeights(chainIds: [String!], completedHeights: Boolean, heightCount: Int): [Block!]!
   hello(name: String): String!
-  lastBlockHeight: BigInt
+  lastBlockHeight: BigInt!
   node(id: ID!): Node
   nodes(ids: [ID!]!): [Node]!
+  transactions(after: String, before: String, events: [String!] = [], first: Int, last: Int, startHeight: Int!): QueryTransactionsConnection!
+}
+
+type QueryTransactionsConnection {
+  edges: [QueryTransactionsConnectionEdge]!
+  pageInfo: PageInfo!
+}
+
+type QueryTransactionsConnectionEdge {
+  cursor: String!
+  node: Transaction!
 }
 
 type Subscription {
@@ -58,9 +80,10 @@ type Subscription {
 }
 
 type Transaction implements Node {
-  block: Block
+  block: Block!
   code: String
   data: String
+  events: [Event!]!
   gas: BigInt!
   id: ID!
   nonce: String!

@@ -1,3 +1,4 @@
+import 'appmetrics-dash/monitor';
 import 'json-bigint-patch';
 import './graph';
 

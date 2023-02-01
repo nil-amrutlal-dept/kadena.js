@@ -1,8 +1,4 @@
-import { prismaClient } from '../../db/prismaClient';
 import { builder } from '../builder';
-
-import { prismaModelName } from '@pothos/plugin-prisma';
-import { Prisma } from '@prisma/client';
 
 export default builder.prismaNode('Block', {
   id: { field: 'hash' },
@@ -19,61 +15,27 @@ export default builder.prismaNode('Block', {
     // computed fields
 
     // relations
-    transactions: t.prismaConnection({
+    transactions: t.relatedConnection('transactions', {
+      cursor: 'blockHash_requestkey',
       args: {
         events: t.arg.stringList({ required: false, defaultValue: [] }),
       },
-      type: 'Transaction',
-      cursor: 'block_requestkey',
-      async totalCount(parent, { events }, context, info) {
-        return prismaClient.transaction.count({
-          where: {
-            block: parent.hash,
-            requestkey: {
-              in: await getTransactionsRequestkeyByEvent(events || [], parent),
+      totalCount: true,
+      query({ events }) {
+        if (events && events.length > 0)
+          return {
+            where: {
+              events: {
+                some: {
+                  qualname: {
+                    in: events,
+                  },
+                },
+              },
             },
-          },
-        });
-      },
-      async resolve(query, parent, { events }, context, info) {
-        return prismaClient.transaction.findMany({
-          ...query,
-          where: {
-            block: parent.hash,
-            requestkey: {
-              in: await getTransactionsRequestkeyByEvent(events || [], parent),
-            },
-          },
-        });
+          };
+        return {};
       },
     }),
   }),
 });
-
-async function getTransactionsRequestkeyByEvent(
-  events: string[] | undefined,
-  parent: {
-    hash: string;
-  } & { [prismaModelName]?: 'Block' | undefined },
-): Promise<string[]> {
-  if (events && events.length > 0) {
-    return (
-      await prismaClient.$queryRaw<{ requestkey: string }[]>`
-      SELECT t.requestkey
-      FROM transactions t
-      INNER JOIN events e
-      ON e.block = t.block AND e.requestkey = t.requestkey
-      WHERE e.qualname IN (${Prisma.join(events as string[])})
-      AND t.block = ${parent.hash}`
-    ).map((r) => r.requestkey);
-  } else {
-    return (
-      await prismaClient.$queryRaw<{ requestkey: string }[]>`
-      SELECT t.requestkey
-      FROM transactions t
-      INNER JOIN events e
-      ON e.block = t.block AND e.requestkey = t.requestkey
-      WHERE t.block = ${parent.hash}`
-    ).map((r) => r.requestkey);
-  }
-}

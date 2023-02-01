@@ -14,7 +14,7 @@ builder.queryField('completedBlockHeights', (t) => {
     type: [Block],
 
     resolve: async (
-      __query,
+      query,
       __parent,
       { completedHeights: onlyCompleted = false, heightCount = 3 },
     ) => {
@@ -31,6 +31,7 @@ builder.queryField('completedBlockHeights', (t) => {
 
         if (completedHeights.length > 0) {
           return prismaClient.block.findMany({
+            ...query,
             where: {
               AND: [
                 {
@@ -54,6 +55,7 @@ builder.queryField('completedBlockHeights', (t) => {
       }
 
       return prismaClient.block.findMany({
+        ...query,
         where: {
           height: {
             in: await prismaClient.$queryRaw`

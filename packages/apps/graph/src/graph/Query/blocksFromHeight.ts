@@ -1,7 +1,6 @@
 import { prismaClient } from '../../db/prismaClient';
 import { dotenv } from '../../utils/dotenv';
 import { builder } from '../builder';
-import Block from '../objects/Block';
 
 builder.queryField('blocksFromHeight', (t) => {
   return t.prismaField({
@@ -10,10 +9,10 @@ builder.queryField('blocksFromHeight', (t) => {
       chainIds: t.arg.intList({ required: false }),
     },
 
-    type: [Block],
+    type: ['Block'],
 
     resolve: async (
-      __query,
+      query,
       __parent,
       {
         startHeight,
@@ -21,6 +20,7 @@ builder.queryField('blocksFromHeight', (t) => {
       },
     ) => {
       return prismaClient.block.findMany({
+        ...query,
         where: {
           AND: [
             {
